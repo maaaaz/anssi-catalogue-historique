@@ -40,4 +40,17 @@ jobs:
           echo "[+] NO UPDATE"
         else
           echo "[!] FILE UPDATE"
+          CURRENT_YEAR_DIR=$(date '+%Y')
+          CURRENT_DATE=$(date '+%Y%m%d')
+          
+          cd "$GITHUB_WORKSPACE"
+          mkdir -p "$CURRENT_YEAR_DIR"
+          cp -f "$CATALOG_FNAME" "$CURRENT_YEAR_DIR/$CURRENT_DATE-catalogue.pdf"
+          cp -f "$CATALOG_HASH_FNAME" "$GITHUB_WORKSPACE/$LASTEST_HASH_FNAME"
+          
+          git config user.name scraping-bot
+          git config user.email github-actions@github.com
+          git add -A
+          git commit -m "updating bot - $(date '+%Y/%m/%d')"
+          git push
         fi
