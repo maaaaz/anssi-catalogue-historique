@@ -15,7 +15,7 @@ env:
   LASTEST_HASH_FNAME: latest_file_sha256.txt
   
 jobs:
-  scraper:
+  check:
     runs-on: ubuntu-latest
 
     steps:
@@ -37,7 +37,7 @@ jobs:
         sha256sum "$CATALOG_FNAME" > "$CATALOG_HASH_FNAME"
 
         if sha256sum -c "$GITHUB_WORKSPACE/$LASTEST_HASH_FNAME"; then
-          echo "OK"
+          echo "[+] NO UPDATE"
         else
-          echo "FAILED"
+          echo "[!] FILE UPDATE"
         fi
