@@ -1,0 +1,42 @@
+name: Daily update check
+
+on: 
+  workflow_dispatch
+  #schedule:
+  #  - cron:  '30 00 * * *'
+
+permissions:
+  contents: write
+
+env:
+  CATALOG_URL: https://messervices.cyber.gouv.fr/visas/catalogue-produits-services-profils-de-protection-sites-certifies-qualifies-agrees-anssi.pdf
+  CATALOG_FNAME: /tmp/catalogue.pdf
+  CATALOG_HASH_FNAME: /tmp/catalogue.sha256
+  LASTEST_HASH_FNAME: latest_file_sha256.txt
+  
+jobs:
+  scraper:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Install prerequisites
+      run: |
+        pip install curl_cffi
+
+    - name: Get file
+      run: |
+        cd /tmp/
+        curl-cffi get --headers "$CATALOG_URL" -d -o "$CATALOG_FNAME"
+
+    - name: Check
+      run: |
+        cd /tmp/
+        sha256sum "$CATALOG_FNAME" > "$CATALOG_HASH_FNAME"
+
+        if sha256sum -c "$GITHUB_WORKSPACE/$LASTEST_HASH_FNAME"; then
+          echo "OK"
+        else
+          echo "FAILED"
+        fi
